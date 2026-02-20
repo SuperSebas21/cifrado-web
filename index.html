@@ -93,7 +93,6 @@
 </div>
 
 <script>
-    // Generar alfabeto ASCII imprimible (del 32 al 126)
     function generarAscii() {
         let asciiStr = '';
         for (let i = 32; i <= 126; i++) {
@@ -104,14 +103,19 @@
 
     function procesarTexto(texto, alfabetoUsuario, modulo, metodo, accion) {
         let resultado = '';
+        
+        // 1)
         let alfabeto = alfabetoUsuario || generarAscii();
+        
+        // 2)
         const n = alfabeto.length;
 
+        // 3)
         for (let i = 0; i < texto.length; i++) {
             let char = texto[i];
             let index = alfabeto.indexOf(char);
 
-            // Si el carácter no está en nuestro alfabeto, lo dejamos igual
+            // 4)
             if (index === -1) {
                 resultado += char;
                 continue;
@@ -119,6 +123,7 @@
 
             let nuevoIndex;
 
+            // 5)
             if (metodo === 'cesar') {
                 let desplazamiento = parseInt(modulo) % n;
                 if (isNaN(desplazamiento)) desplazamiento = 0;
@@ -127,12 +132,12 @@
                     desplazamiento = -desplazamiento;
                 }
                 
+                // 6)
                 nuevoIndex = (index + desplazamiento) % n;
-                // Manejo de números negativos en el módulo de JavaScript
                 if (nuevoIndex < 0) nuevoIndex += n; 
 
             } else if (metodo === 'atbash') {
-                // Atbash es reflexivo: cifrar y descifrar es la misma operación
+                // 7)
                 nuevoIndex = (n - 1) - index;
             }
 
