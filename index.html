@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cifrador César y Atbash</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+        }
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            max-width: 600px;
+            width: 100%;
+        }
+        h1 { text-align: center; color: #2c3e50; }
+        label { font-weight: bold; margin-top: 15px; display: block; }
+        textarea, input, select {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        textarea { resize: vertical; height: 100px; }
+        .row { display: flex; gap: 15px; }
+        .col { flex: 1; }
+        .buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 4px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .btn-cifrar { background-color: #27ae60; }
+        .btn-cifrar:hover { background-color: #2ecc71; }
+        .btn-descifrar { background-color: #e74c3c; }
+        .btn-descifrar:hover { background-color: #c0392b; }
+        .nota { font-size: 0.85em; color: #7f8c8d; margin-top: 5px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Cifrador Web</h1>
+    
+    <label for="textoEntrada">Texto a procesar:</label>
+    <textarea id="textoEntrada" placeholder="Ingresa tu mensaje aquí..."></textarea>
+
+    <label for="alfabeto">Conjunto de caracteres (Alfabeto):</label>
+    <input type="text" id="alfabeto" placeholder="Ej: ABCDEFGHIJKLMNOPQRSTUVWXYZ">
+    <div class="nota">Si lo dejas en blanco, se usará el código ASCII imprimible por defecto.</div>
+
+    <div class="row">
+        <div class="col">
+            <label for="metodo">Método:</label>
+            <select id="metodo">
+                <option value="cesar">César</option>
+                <option value="atbash">Atbash</option>
+            </select>
+        </div>
+        <div class="col">
+            <label for="modulo">Módulo (Desplazamiento César):</label>
+            <input type="number" id="modulo" value="3">
+            <div class="nota">Solo aplica para el método César.</div>
+        </div>
+    </div>
+
+    <div class="buttons">
+        <button class="btn-cifrar" onclick="ejecutar('cifrar')">Cifrar</button>
+        <button class="btn-descifrar" onclick="ejecutar('descifrar')">Descifrar</button>
+    </div>
+
+    <label for="textoSalida">Resultado:</label>
+    <textarea id="textoSalida" readonly placeholder="El resultado aparecerá aquí..."></textarea>
+</div>
+
+<script>
+    // Generar alfabeto ASCII imprimible (del 32 al 126)
+    function generarAscii() {
+        let asciiStr = '';
+        for (let i = 32; i <= 126; i++) {
+            asciiStr += String.fromCharCode(i);
+        }
+        return asciiStr;
+    }
+
+    function procesarTexto(texto, alfabetoUsuario, modulo, metodo, accion) {
+        let resultado = '';
+        let alfabeto = alfabetoUsuario || generarAscii();
+        const n = alfabeto.length;
+
+        for (let i = 0; i < texto.length; i++) {
+            let char = texto[i];
+            let index = alfabeto.indexOf(char);
+
+            // Si el carácter no está en nuestro alfabeto, lo dejamos igual
+            if (index === -1) {
+                resultado += char;
+                continue;
+            }
+
+            let nuevoIndex;
+
+            if (metodo === 'cesar') {
+                let desplazamiento = parseInt(modulo) % n;
+                if (isNaN(desplazamiento)) desplazamiento = 0;
+                
+                if (accion === 'descifrar') {
+                    desplazamiento = -desplazamiento;
+                }
+                
+                nuevoIndex = (index + desplazamiento) % n;
+                // Manejo de números negativos en el módulo de JavaScript
+                if (nuevoIndex < 0) nuevoIndex += n; 
+
+            } else if (metodo === 'atbash') {
+                // Atbash es reflexivo: cifrar y descifrar es la misma operación
+                nuevoIndex = (n - 1) - index;
+            }
+
+            resultado += alfabeto[nuevoIndex];
+        }
+
+        return resultado;
+    }
+
+    function ejecutar(accion) {
+        const texto = document.getElementById('textoEntrada').value;
+        const alfabeto = document.getElementById('alfabeto').value;
+        const modulo = document.getElementById('modulo').value;
+        const metodo = document.getElementById('metodo').value;
+
+        const resultado = procesarTexto(texto, alfabeto, modulo, metodo, accion);
+        document.getElementById('textoSalida').value = resultado;
+    }
+</script>
+
+</body>
+</html>
